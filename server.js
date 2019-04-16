@@ -15,7 +15,8 @@ app.get('/get-credentials', (req, res) => {
         return;
     }
     var u = utils.makeUsername(config.usernameLength);
-    var p = pemKey.encrypt(u + config.electionId, 'base64');
+    var b = Buffer.from(u+ config.electionId, 'base64')
+    var p = pemKey.sign(b, 'base64', 'base64');
     // p = crypto.createHmac('sha256', pwd).digest('hex');
     res.status(200).json({ u, p });
 });
@@ -34,6 +35,5 @@ fs.readFile(config.privateKeyFile, (err, data) => {
         process.exit(1);
     }
     pemKey = new NodeRSA(data);
+    app.listen(port, () => console.log(`Trusted Organization app listening on port ${port}!`))
 });
-
-app.listen(port, () => console.log(`Trusted Organization app listening on port ${port}!`))
